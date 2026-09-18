@@ -1,0 +1,74 @@
+﻿# ============================================================
+# SERVIQO — Docker Compose (Development Only)
+# ============================================================
+# DEVELOPMENT USE ONLY — credentials are dev defaults.
+# Production deployments MUST use external secrets management.
+# Never commit real production credentials to Git.
+#
+# Quick commands:
+#   Start:     docker compose up -d
+#   Stop:      docker compose down
+#   Reset DB:  docker compose down -v
+#   pgAdmin:   docker compose --profile tools up -d
+# ============================================================
+
+services:
+
+  # ----------------------------------------------------------
+  # PostgreSQL 16 — primary database
+  # Credentials read from .env file (see docker/.env.example)
+  # ----------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: serviqo_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-serviqo}
+      POSTGRES_USER:     ${POSTGRES_USER:-serviqo_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-serviqo_dev_password}
+      PGDATA:            /var/lib/postgresql/data/pgdata
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-serviqo_user} -d ${POSTGRES_DB:-serviqo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - serviqo_network
+
+  # ----------------------------------------------------------
+  # pgAdmin 4 — optional DB browser (profile: tools)
+  # Usage: docker compose --profile tools up -d
+  # Access: http://localhost:5050
+  # NOT required for normal development.
+  # ----------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: serviqo_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL:    ${PGADMIN_EMAIL:-admin@serviqo.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-pgadmin_dev}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - serviqo_network
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  serviqo_network:
+    driver: bridge
+    name: serviqo_network

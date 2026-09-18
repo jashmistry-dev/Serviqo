@@ -1,0 +1,7 @@
+﻿* text=auto
+*.bat text eol=crlf
+*.sh text eol=lf
+*.dart text eol=lf
+*.php text eol=lf
+*.tsx text eol=lf
+*.ts text eol=lf

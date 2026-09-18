@@ -1,0 +1,71 @@
+﻿# ============================================================
+# SERVIQO — Root .gitignore
+# ============================================================
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+._*
+
+# Editors / IDEs
+.idea/
+.vscode/
+*.swp
+*~
+.history/
+
+# Secrets / Environment
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Laravel (backend/)
+backend/.env
+backend/vendor/
+backend/node_modules/
+backend/storage/logs/*.log
+backend/storage/framework/cache/data/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/bootstrap/cache/*.php
+backend/.phpunit.cache/
+backend/coverage/
+
+# Flutter (mobile/)
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/.packages
+mobile/build/
+mobile/.idea/
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties
+mobile/.metadata
+
+# React Admin (admin/)
+admin/node_modules/
+admin/dist/
+admin/.env
+admin/.env.local
+admin/.env.production
+admin/coverage/
+
+# Docker
+docker/postgres-data/
+docker/*.log
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Build artifacts
+*.zip
+*.tar.gz
+*.apk
+*.aab

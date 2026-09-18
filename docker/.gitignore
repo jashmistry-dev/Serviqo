@@ -1,0 +1,5 @@
+﻿# Docker environment file — contains dev credentials, never commit
+.env
+# PostgreSQL data directory
+postgres-data/
+*.log
