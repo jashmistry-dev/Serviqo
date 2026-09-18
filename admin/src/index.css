@@ -1,0 +1,19 @@
+﻿@import "tailwindcss";
+
+/*
+ * Serviqo Admin Panel — Global Styles
+ * Tailwind CSS v4 (Vite plugin mode — no tailwind.config.ts needed)
+ */
+
+:root {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
