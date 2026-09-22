@@ -1,4 +1,4 @@
-﻿# Serviqo — Verified Local Service Marketplace
+# Serviqo — Verified Local Service Marketplace
 
 Serviqo is a local service marketplace connecting **Customers**, **Technicians**, and a **Super Admin**.
 
@@ -91,7 +91,7 @@ php artisan test
 
 ## Development Status
 
-> Phase 1 — Step 1 (Foundation) complete
+> Phase 1 — Step 2 (Database Architecture) complete
 
 ## Note
 
