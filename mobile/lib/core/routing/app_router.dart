@@ -51,29 +51,70 @@ class _SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF1A1A2E),
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'SERVIQO',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 4,
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A1A2E),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final minHeight =
+                constraints.maxHeight.isFinite && constraints.maxHeight > 0
+                    ? constraints.maxHeight
+                    : 0.0;
+            final minWidth =
+                constraints.maxWidth.isFinite && constraints.maxWidth > 0
+                    ? constraints.maxWidth
+                    : 0.0;
+
+            return SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: minHeight,
+                  minWidth: minWidth,
+                ),
+                child: const IntrinsicHeight(
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 24.0,
+                        vertical: 24.0,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'SERVIQO',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 4,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Verified Local Service Marketplace',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Color(0x99FFFFFF),
+                              fontSize: 13,
+                            ),
+                          ),
+                          SizedBox(height: 32),
+                          CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 3,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Verified Local Service Marketplace',
-              style: TextStyle(color: Color(0x99FFFFFF), fontSize: 13),
-            ),
-            SizedBox(height: 32),
-            CircularProgressIndicator(color: Colors.white),
-          ],
+            );
+          },
         ),
       ),
     );
