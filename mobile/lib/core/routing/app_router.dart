@@ -8,6 +8,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_customer_screen.dart';
 import '../../features/auth/presentation/screens/register_technician_screen.dart';
 import '../../features/customer/presentation/screens/customer_dashboard_screen.dart';
+import '../../features/customer/presentation/screens/customer_profile_screen.dart';
 import '../../features/technician/presentation/screens/technician_dashboard_screen.dart';
 
 /// Route path constants.
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String registerCustomer = '/register/customer';
   static const String registerTechnician = '/register/technician';
   static const String customerHome = '/customer';
+  static const String customerProfile = '/customer/profile';
   static const String technicianHome = '/technician';
 }
 
@@ -47,6 +49,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.customerHome,
         builder: (context, state) => const CustomerDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.customerProfile,
+        builder: (context, state) => const CustomerProfileScreen(),
       ),
       GoRoute(
         path: AppRoutes.technicianHome,
@@ -96,64 +102,81 @@ class _SplashScreenState extends ConsumerState<_SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: const Color(0xFF0F172A),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final minHeight =
-                constraints.maxHeight.isFinite && constraints.maxHeight > 0
-                    ? constraints.maxHeight
-                    : 0.0;
-            final minWidth =
-                constraints.maxWidth.isFinite && constraints.maxWidth > 0
-                    ? constraints.maxWidth
-                    : 0.0;
-
             return SingleChildScrollView(
               physics: const ClampingScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: minHeight,
-                  minWidth: minWidth,
+                  minHeight: constraints.maxHeight,
+                  minWidth: constraints.maxWidth,
                 ),
-                child: const IntrinsicHeight(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 24.0,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'SERVIQO',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 4,
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: (screenSize.height * 0.12).clamp(64.0, 96.0),
+                          height: (screenSize.height * 0.12).clamp(64.0, 96.0),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
+                            borderRadius: BorderRadius.circular(24.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                                blurRadius: 20,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text(
-                            'Verified Local Service Marketplace',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0x99FFFFFF),
-                              fontSize: 13,
-                            ),
-                          ),
-                          SizedBox(height: 32),
-                          CircularProgressIndicator(
+                          child: const Icon(
+                            Icons.home_repair_service_rounded,
+                            size: 44,
                             color: Colors.white,
-                            strokeWidth: 3,
                           ),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(height: 24),
+                        const Text(
+                          'SERVIQO',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 4.0,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Verified Local Service Marketplace',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.7),
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 36),
+                        const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: Color(0xFF6366F1),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

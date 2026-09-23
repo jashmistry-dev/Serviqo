@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CityController;
+use App\Http\Controllers\Api\CustomerProfileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +25,11 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+// Public Discovery Endpoints
+Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/categories/{slugOrId}', [CategoryController::class, 'show']);
+Route::get('/cities', [CityController::class, 'index']);
+
 // Role-protected route groups
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/ping', function () {
@@ -39,6 +47,10 @@ Route::middleware(['auth:sanctum', 'role:customer'])->prefix('customer')->group(
             'user' => request()->user(),
         ]);
     });
+
+    // Customer profile management
+    Route::get('/profile', [CustomerProfileController::class, 'show']);
+    Route::put('/profile', [CustomerProfileController::class, 'update']);
 });
 
 Route::middleware(['auth:sanctum', 'role:technician'])->prefix('technician')->group(function () {

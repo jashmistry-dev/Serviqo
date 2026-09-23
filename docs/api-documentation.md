@@ -129,11 +129,6 @@ All authenticated endpoints require an `Authorization: Bearer <token>` header is
 }
 ```
 
-#### Error Responses
-- `401 Unauthorized`: Invalid credentials.
-- `403 Forbidden`: Account is suspended/inactive, or role does not match `expected_role`.
-- `422 Unprocessable Entity`: Validation errors.
-
 ---
 
 ### 1.4 Current User Profile
@@ -142,22 +137,6 @@ All authenticated endpoints require an `Authorization: Bearer <token>` header is
 - **Headers**: `Authorization: Bearer <token>`
 - **Description**: Returns authenticated user with linked role-specific profile (`customer` or `technician`).
 
-#### Response (`200 OK`)
-```json
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "...",
-      "name": "Serviqo Super Admin",
-      "email": "admin@serviqo.com",
-      "role": "admin",
-      "status": "active"
-    }
-  }
-}
-```
-
 ---
 
 ### 1.5 Logout
@@ -165,17 +144,101 @@ All authenticated endpoints require an `Authorization: Bearer <token>` header is
 - **Access**: Authenticated (`auth:sanctum`)
 - **Description**: Revokes the current access token used for authentication.
 
+---
+
+## 2. Service Discovery & Customer Foundation (Phase 4)
+
+### 2.1 List Service Categories
+- **URL**: `GET /categories`
+- **Access**: Public
+- **Description**: Retrieves all active marketplace categories ordered by `sort_order`.
+
 #### Response (`200 OK`)
 ```json
 {
   "success": true,
-  "message": "Logged out successfully"
+  "message": "Service categories retrieved successfully",
+  "data": {
+    "categories": [
+      {
+        "id": "uuid",
+        "name": "Air Conditioner Repair",
+        "slug": "ac-repair",
+        "description": "Cooling and repair services",
+        "min_visiting_charge": "199.00",
+        "is_active": true,
+        "sort_order": 1
+      }
+    ]
+  }
 }
 ```
 
 ---
 
-## 2. Seeded Test Credentials
+### 2.2 Category Detail
+- **URL**: `GET /categories/{slugOrId}`
+- **Access**: Public
+- **Description**: Returns details for a specific category by slug or UUID.
+
+---
+
+### 2.3 List Operating Cities
+- **URL**: `GET /cities`
+- **Access**: Public
+- **Description**: Returns all active operating cities where Serviqo operates.
+
+#### Response (`200 OK`)
+```json
+{
+  "success": true,
+  "message": "Cities retrieved successfully",
+  "data": {
+    "cities": [
+      {
+        "id": "uuid",
+        "name": "Mumbai",
+        "state": "Maharashtra",
+        "pincode": "400001",
+        "is_active": true
+      }
+    ]
+  }
+}
+```
+
+---
+
+### 2.4 Get Customer Profile
+- **URL**: `GET /customer/profile`
+- **Access**: Authenticated Customer (`auth:sanctum`, `role:customer`)
+- **Description**: Returns the customer's personal details, delivery address, coordinates, and operating city.
+
+---
+
+### 2.5 Update Customer Profile
+- **URL**: `PUT /customer/profile`
+- **Access**: Authenticated Customer (`auth:sanctum`, `role:customer`)
+- **Description**: Updates customer profile fields (name, phone, alternate phone, city, address line 1, address line 2, pincode, coordinates).
+
+#### Request Body
+```json
+{
+  "name": "Kavita Sharma",
+  "phone": "9899887766",
+  "alternate_phone": "9811223344",
+  "city_id": "city-uuid",
+  "address_line1": "A-101, Blue Ridge",
+  "address_line2": "Hinjewadi Phase 1",
+  "pincode": "411057",
+  "latitude": 18.5912,
+  "longitude": 73.7389
+}
+```
+
+---
+
+## 3. Seeded Test Credentials
 
 | Role | Email | Password | Phone | Status |
 |---|---|---|---|---|
