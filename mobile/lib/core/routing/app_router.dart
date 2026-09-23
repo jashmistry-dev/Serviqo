@@ -10,6 +10,8 @@ import '../../features/auth/presentation/screens/register_technician_screen.dart
 import '../../features/customer/presentation/screens/customer_dashboard_screen.dart';
 import '../../features/customer/presentation/screens/customer_profile_screen.dart';
 import '../../features/technician/presentation/screens/technician_dashboard_screen.dart';
+import '../../features/technician/presentation/screens/technician_profile_screen.dart';
+import '../../features/technician/presentation/screens/technician_verification_screen.dart';
 
 /// Route path constants.
 class AppRoutes {
@@ -22,6 +24,8 @@ class AppRoutes {
   static const String customerHome = '/customer';
   static const String customerProfile = '/customer/profile';
   static const String technicianHome = '/technician';
+  static const String technicianProfile = '/technician/profile';
+  static const String technicianVerification = '/technician/verification';
 }
 
 /// Application router provider.
@@ -57,6 +61,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.technicianHome,
         builder: (context, state) => const TechnicianDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.technicianProfile,
+        builder: (context, state) => const TechnicianProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.technicianVerification,
+        builder: (context, state) => const TechnicianVerificationScreen(),
       ),
     ],
   );

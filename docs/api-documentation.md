@@ -102,47 +102,18 @@ All authenticated endpoints require an `Authorization: Bearer <token>` header is
 - **Access**: Public
 - **Description**: Authenticates users by email OR phone. Rejects inactive or suspended accounts. Optionally enforces `expected_role` (e.g. Admin portal passes `expected_role: 'admin'`).
 
-#### Request Body
-```json
-{
-  "login": "admin@serviqo.com",
-  "password": "Admin@123",
-  "expected_role": "admin"
-}
-```
-
-#### Response (`200 OK`)
-```json
-{
-  "success": true,
-  "message": "Logged in successfully",
-  "data": {
-    "user": {
-      "id": "...",
-      "name": "Serviqo Super Admin",
-      "email": "admin@serviqo.com",
-      "role": "admin",
-      "status": "active"
-    },
-    "token": "3|sanctum_token_string..."
-  }
-}
-```
-
 ---
 
 ### 1.4 Current User Profile
 - **URL**: `GET /auth/me`
 - **Access**: Authenticated (`auth:sanctum`)
 - **Headers**: `Authorization: Bearer <token>`
-- **Description**: Returns authenticated user with linked role-specific profile (`customer` or `technician`).
 
 ---
 
 ### 1.5 Logout
 - **URL**: `POST /auth/logout`
 - **Access**: Authenticated (`auth:sanctum`)
-- **Description**: Revokes the current access token used for authentication.
 
 ---
 
@@ -153,92 +124,87 @@ All authenticated endpoints require an `Authorization: Bearer <token>` header is
 - **Access**: Public
 - **Description**: Retrieves all active marketplace categories ordered by `sort_order`.
 
-#### Response (`200 OK`)
-```json
-{
-  "success": true,
-  "message": "Service categories retrieved successfully",
-  "data": {
-    "categories": [
-      {
-        "id": "uuid",
-        "name": "Air Conditioner Repair",
-        "slug": "ac-repair",
-        "description": "Cooling and repair services",
-        "min_visiting_charge": "199.00",
-        "is_active": true,
-        "sort_order": 1
-      }
-    ]
-  }
-}
-```
-
 ---
 
 ### 2.2 Category Detail
 - **URL**: `GET /categories/{slugOrId}`
 - **Access**: Public
-- **Description**: Returns details for a specific category by slug or UUID.
 
 ---
 
 ### 2.3 List Operating Cities
 - **URL**: `GET /cities`
 - **Access**: Public
-- **Description**: Returns all active operating cities where Serviqo operates.
-
-#### Response (`200 OK`)
-```json
-{
-  "success": true,
-  "message": "Cities retrieved successfully",
-  "data": {
-    "cities": [
-      {
-        "id": "uuid",
-        "name": "Mumbai",
-        "state": "Maharashtra",
-        "pincode": "400001",
-        "is_active": true
-      }
-    ]
-  }
-}
-```
 
 ---
 
 ### 2.4 Get Customer Profile
 - **URL**: `GET /customer/profile`
 - **Access**: Authenticated Customer (`auth:sanctum`, `role:customer`)
-- **Description**: Returns the customer's personal details, delivery address, coordinates, and operating city.
 
 ---
 
 ### 2.5 Update Customer Profile
 - **URL**: `PUT /customer/profile`
 - **Access**: Authenticated Customer (`auth:sanctum`, `role:customer`)
-- **Description**: Updates customer profile fields (name, phone, alternate phone, city, address line 1, address line 2, pincode, coordinates).
-
-#### Request Body
-```json
-{
-  "name": "Kavita Sharma",
-  "phone": "9899887766",
-  "alternate_phone": "9811223344",
-  "city_id": "city-uuid",
-  "address_line1": "A-101, Blue Ridge",
-  "address_line2": "Hinjewadi Phase 1",
-  "pincode": "411057",
-  "latitude": 18.5912,
-  "longitude": 73.7389
-}
-```
 
 ---
 
-## 3. Seeded Test Credentials
+## 3. Technician Management & Admin Verification (Phase 5)
+
+### 3.1 Get Technician Profile
+- **URL**: `GET /technician/profile`
+- **Access**: Authenticated Technician (`role:technician`)
+- **Description**: Returns technician profile with services, verifications, city, and statistics.
+
+---
+
+### 3.2 Update Technician Profile & Rates
+- **URL**: `PUT /technician/profile`
+- **Access**: Authenticated Technician (`role:technician`)
+- **Parameters**: `name`, `phone`, `bio`, `experience_years`, `visiting_charge`, `city_id`, `address`, `pincode`.
+
+---
+
+### 3.3 Toggle Duty Availability
+- **URL**: `POST /technician/availability`
+- **Access**: Authenticated Technician (`role:technician`)
+- **Body**: `{"is_available": true}`
+- **Business Rule Guard**: Only verified technicians (`verification_status == 'verified'`) can toggle availability online. Unverified or suspended technicians receive `422 Unprocessable Entity`.
+
+---
+
+### 3.4 Upload Verification Document
+- **URL**: `POST /technician/verifications`
+- **Access**: Authenticated Technician (`role:technician`)
+- **Content-Type**: `multipart/form-data`
+- **Body**: `document_type` (`government_id`, `police_clearance`, `certification`, `address_proof`), `document_number`, `document` (PDF/Image file up to 5MB).
+- **Effect**: Stores document, automatically sets status to `under_review`.
+
+---
+
+### 3.5 Admin: View Verification Queue
+- **URL**: `GET /admin/verifications`
+- **Access**: Authenticated Super Admin (`role:admin`)
+- **Query Params**: `status` (`pending`, `under_review`, `verified`, `rejected`, `suspended`, `all`), `search`.
+
+---
+
+### 3.6 Admin: Review Technician Application
+- **URL**: `POST /admin/verifications/{technicianId}/review`
+- **Access**: Authenticated Super Admin (`role:admin`)
+- **Body**:
+```json
+{
+  "action": "approve", // or "reject", "suspend"
+  "reason": "Clear government Aadhaar and trade license verified."
+}
+```
+- **Audit Rule**: Writes an immutable audit record to `audit_logs` table containing `admin.id`, `event`, `old_values`, `new_values`, and client metadata.
+
+---
+
+## 4. Seeded Test Credentials
 
 | Role | Email | Password | Phone | Status |
 |---|---|---|---|---|

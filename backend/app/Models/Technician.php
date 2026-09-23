@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Technician extends Model
@@ -66,8 +68,63 @@ class Technician extends Model
         return $this->belongsTo(User::class, 'verified_by');
     }
 
+    public function verifications(): HasMany
+    {
+        return $this->hasMany(TechnicianVerification::class);
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(TechnicianService::class);
+    }
+
+    public function serviceCategories(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ServiceCategory::class,
+            'technician_services',
+            'technician_id',
+            'service_category_id'
+        )->withPivot(['custom_visiting_charge', 'experience_years', 'is_active'])->withTimestamps();
+    }
+
     public function isVerified(): bool
     {
         return $this->verification_status === 'verified';
+    }
+
+    public function markUnderReview(): void
+    {
+        $this->update(['verification_status' => 'under_review']);
+    }
+
+    public function markVerified(string $adminId): void
+    {
+        $this->update([
+            'verification_status' => 'verified',
+            'verified_at' => now(),
+            'verified_by' => $adminId,
+            'verification_notes' => null,
+        ]);
+    }
+
+    public function markRejected(string $adminId, string $reason): void
+    {
+        $this->update([
+            'verification_status' => 'rejected',
+            'verified_at' => null,
+            'verified_by' => $adminId,
+            'verification_notes' => $reason,
+        ]);
+    }
+
+    public function markSuspended(string $adminId, string $reason): void
+    {
+        $this->update([
+            'verification_status' => 'suspended',
+            'is_available' => false,
+            'verified_by' => $adminId,
+            'verification_notes' => $reason,
+        ]);
     }
 }

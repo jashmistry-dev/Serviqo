@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\AdminVerificationController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CustomerProfileController;
+use App\Http\Controllers\Api\TechnicianProfileController;
+use App\Http\Controllers\Api\TechnicianSkillController;
+use App\Http\Controllers\Api\TechnicianVerificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,7 +34,7 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/categories/{slugOrId}', [CategoryController::class, 'show']);
 Route::get('/cities', [CityController::class, 'index']);
 
-// Role-protected route groups
+// Role-protected: Super Admin
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/ping', function () {
         return response()->json([
@@ -38,8 +42,14 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
             'user' => request()->user(),
         ]);
     });
+
+    // Technician Verification Management
+    Route::get('/verifications', [AdminVerificationController::class, 'index']);
+    Route::get('/verifications/{technicianId}', [AdminVerificationController::class, 'show']);
+    Route::post('/verifications/{technicianId}/review', [AdminVerificationController::class, 'review']);
 });
 
+// Role-protected: Customer
 Route::middleware(['auth:sanctum', 'role:customer'])->prefix('customer')->group(function () {
     Route::get('/ping', function () {
         return response()->json([
@@ -53,6 +63,7 @@ Route::middleware(['auth:sanctum', 'role:customer'])->prefix('customer')->group(
     Route::put('/profile', [CustomerProfileController::class, 'update']);
 });
 
+// Role-protected: Technician
 Route::middleware(['auth:sanctum', 'role:technician'])->prefix('technician')->group(function () {
     Route::get('/ping', function () {
         return response()->json([
@@ -60,4 +71,18 @@ Route::middleware(['auth:sanctum', 'role:technician'])->prefix('technician')->gr
             'user' => request()->user(),
         ]);
     });
+
+    // Profile & Availability
+    Route::get('/profile', [TechnicianProfileController::class, 'show']);
+    Route::put('/profile', [TechnicianProfileController::class, 'update']);
+    Route::post('/availability', [TechnicianProfileController::class, 'toggleAvailability']);
+
+    // Skills & Services
+    Route::get('/skills', [TechnicianSkillController::class, 'index']);
+    Route::post('/skills', [TechnicianSkillController::class, 'store']);
+    Route::delete('/skills/{categoryId}', [TechnicianSkillController::class, 'destroy']);
+
+    // Verification Documents
+    Route::get('/verifications', [TechnicianVerificationController::class, 'index']);
+    Route::post('/verifications', [TechnicianVerificationController::class, 'store']);
 });
