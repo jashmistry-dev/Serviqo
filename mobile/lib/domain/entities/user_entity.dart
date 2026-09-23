@@ -1,10 +1,9 @@
-﻿import 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart';
 
 enum UserRole { customer, technician, admin }
 
 /// Core domain entity for an authenticated user.
-/// This is a pure Dart class — no framework dependencies.
-final class UserEntity extends Equatable {
+class UserEntity extends Equatable {
   const UserEntity({
     required this.id,
     required this.name,

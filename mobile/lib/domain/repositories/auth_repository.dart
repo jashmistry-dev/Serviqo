@@ -1,15 +1,33 @@
-﻿import '../entities/user_entity.dart';
+import '../entities/user_entity.dart';
 
-/// Abstract contract for authentication operations.
-/// Concrete implementation lives in data/repositories/.
 abstract interface class AuthRepository {
-  /// Log in with email and password.
-  /// Returns the authenticated [UserEntity] on success.
-  Future<UserEntity> login({required String email, required String password});
+  Future<UserEntity> login({
+    required String email,
+    required String password,
+    String? expectedRole,
+  });
 
-  /// Log out the currently authenticated user.
+  Future<UserEntity> registerCustomer({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+    String? addressLine1,
+    String? pincode,
+  });
+
+  Future<UserEntity> registerTechnician({
+    required String name,
+    required String email,
+    required String phone,
+    required String password,
+    required int experienceYears,
+    required double visitingCharge,
+    String? bio,
+    String? pincode,
+  });
+
   Future<void> logout();
 
-  /// Get the currently stored authenticated user, or null if not logged in.
   Future<UserEntity?> getCurrentUser();
 }

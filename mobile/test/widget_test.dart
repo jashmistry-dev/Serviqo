@@ -1,4 +1,4 @@
-﻿// Serviqo — Foundation widget tests.
+// Serviqo Foundation widget tests.
 // Tests splash screen responsiveness across different viewports.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,20 +14,24 @@ void main() {
     // Verify the app widget tree is built
     expect(find.byType(ServiqoApp), findsOneWidget);
 
-    // Pump a few frames to let the router initialize
+    // Pump initial frame to render splash screen
     await tester.pump();
 
     // Splash screen should appear (has 'SERVIQO' text)
     expect(find.text('SERVIQO'), findsOneWidget);
     expect(find.text('Verified Local Service Marketplace'), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    // Advance time past the splash delay to complete timer
+    await tester.pump(const Duration(milliseconds: 1500));
   });
 
   testWidgets('ServiqoApp can be pumped without exceptions', (WidgetTester tester) async {
     await tester.pumpWidget(
       const ProviderScope(child: ServiqoApp()),
     );
-    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1500));
 
     // No exceptions thrown = test passes
     expect(tester.takeException(), isNull);
@@ -50,6 +54,8 @@ void main() {
     // Verify text renders and no RenderFlex overflow occurs
     expect(find.text('SERVIQO'), findsOneWidget);
     expect(tester.takeException(), isNull);
+
+    await tester.pump(const Duration(milliseconds: 1500));
   });
 
   testWidgets('Splash screen renders properly on desktop widescreen', (WidgetTester tester) async {
@@ -67,5 +73,7 @@ void main() {
 
     expect(find.text('SERVIQO'), findsOneWidget);
     expect(tester.takeException(), isNull);
+
+    await tester.pump(const Duration(milliseconds: 1500));
   });
 }

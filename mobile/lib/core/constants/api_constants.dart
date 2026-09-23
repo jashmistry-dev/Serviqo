@@ -1,15 +1,25 @@
-﻿/// Serviqo API endpoint constants.
-/// Update baseUrl to match your development environment:
-///   - Android emulator: `http://10.0.2.2:8080/api`
-///   - Physical device (same WiFi): `http://YOUR_LAN_IP:8080/api`
+import 'package:flutter/foundation.dart';
+
+/// Serviqo API endpoint constants.
 class ApiConstants {
   ApiConstants._();
 
-  /// Development default — Android emulator accesses host via 10.0.2.2
-  static const String baseUrl = 'http://10.0.2.2:8080/api';
+  /// Dynamically resolves base URL depending on platform.
+  /// Web -> 127.0.0.1:8080/api
+  /// Android Emulator -> 10.0.2.2:8080/api
+  static String get baseUrl {
+    if (kIsWeb) {
+      return 'http://127.0.0.1:8080/api';
+    }
+    return 'http://10.0.2.2:8080/api';
+  }
 
-  // For physical device on same WiFi, replace with your LAN IP:
-  // static const String baseUrl = 'http://192.168.x.x:8080/api';
+  // Auth endpoints
+  static const String login = '/auth/login';
+  static const String registerCustomer = '/auth/register/customer';
+  static const String registerTechnician = '/auth/register/technician';
+  static const String logout = '/auth/logout';
+  static const String me = '/auth/me';
 
   // Timeouts
   static const int connectTimeoutMs = 10000;

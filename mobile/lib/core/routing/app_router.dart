@@ -1,6 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/providers/auth_notifier.dart';
+import '../../features/auth/presentation/providers/auth_state.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/register_customer_screen.dart';
+import '../../features/auth/presentation/screens/register_technician_screen.dart';
+import '../../features/customer/presentation/screens/customer_dashboard_screen.dart';
+import '../../features/technician/presentation/screens/technician_dashboard_screen.dart';
 
 /// Route path constants.
 class AppRoutes {
@@ -8,16 +16,17 @@ class AppRoutes {
 
   static const String splash = '/';
   static const String login = '/login';
+  static const String registerCustomer = '/register/customer';
+  static const String registerTechnician = '/register/technician';
   static const String customerHome = '/customer';
   static const String technicianHome = '/technician';
 }
 
 /// Application router provider.
-/// Auth redirect guard will be wired in Step 3.
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: AppRoutes.splash,
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: false,
     routes: [
       GoRoute(
         path: AppRoutes.splash,
@@ -25,29 +34,65 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) =>
-            const _PlaceholderScreen(title: 'Login'),
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.registerCustomer,
+        builder: (context, state) => const RegisterCustomerScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.registerTechnician,
+        builder: (context, state) => const RegisterTechnicianScreen(),
       ),
       GoRoute(
         path: AppRoutes.customerHome,
-        builder: (context, state) =>
-            const _PlaceholderScreen(title: 'Customer Home'),
+        builder: (context, state) => const CustomerDashboardScreen(),
       ),
       GoRoute(
         path: AppRoutes.technicianHome,
-        builder: (context, state) =>
-            const _PlaceholderScreen(title: 'Technician Home'),
+        builder: (context, state) => const TechnicianDashboardScreen(),
       ),
     ],
   );
 });
 
-// ignore_for_file: unused_element_parameter
-// These are private widgets only used via const — key is never passed externally.
-
-class _SplashScreen extends StatelessWidget {
-  // ignore: unused_element
+class _SplashScreen extends ConsumerStatefulWidget {
   const _SplashScreen();
+
+  @override
+  ConsumerState<_SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<_SplashScreen> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer(const Duration(milliseconds: 1200), _checkAndNavigate);
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _checkAndNavigate() {
+    if (!mounted) return;
+
+    final authState = ref.read(authNotifierProvider);
+
+    if (authState is Authenticated) {
+      if (authState.user.isTechnician) {
+        context.go(AppRoutes.technicianHome);
+      } else {
+        context.go(AppRoutes.customerHome);
+      }
+    } else {
+      context.go(AppRoutes.login);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,22 +161,6 @@ class _SplashScreen extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  // ignore: unused_element
-  const _PlaceholderScreen({required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Text('$title — will be implemented in later steps.'),
       ),
     );
   }
